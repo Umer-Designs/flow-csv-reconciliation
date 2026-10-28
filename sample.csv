@@ -1,0 +1,6 @@
+invoice_id,customer,amount,paid
+INV-001,Acme Demo,1250.00,500.00
+INV-002,Studio Demo,899.99,899.99
+INV-003,Workshop Demo,340.50,0.00
+INV-003,Duplicate Demo,20.00,0.00
+INV-004,Invalid Demo,-5.00,0.00
