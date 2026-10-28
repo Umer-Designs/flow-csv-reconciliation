@@ -1,32 +1,28 @@
-# Flow CSV Reconciliation
+# Flow CSV reconciliation
 
-Independent portfolio project by Umer Khalid, 2026. All example data is fictional.
+Validate invoice CSV exports and calculate outstanding balances using the Python standard library.
+
+[Portfolio](https://umer-designs.github.io) · [Browser interface](https://umer-designs.github.io/automation.html)
 
 ## Run
 
-```text
+Requires Python 3.12+. Processing itself needs no external packages or API credits.
+
+```sh
 python flow.py sample.csv --output report.json --state runs.db
-# Optional test dependency
+# Tests only:
 python -m pip install pytest
 python -m pytest -q
 ```
 
-Requires Python 3.12+. Processing uses the standard library; pytest is needed only for tests.
+Expected header: `invoice_id,customer,amount,paid`. Inputs are limited to 100 KB and use USD. Currency fields allow up to two decimal places. Invalid amounts, missing identifiers, extra columns, overpayments and duplicate invoice IDs are rejected with source line numbers. Quoted CSV customer names are supported.
 
-## Features
+## Design
 
-Python standard library pipeline. Decimal validation, duplicate rejection, outstanding totals, deterministic summary, content-addressed SQLite cache, atomic output. CSV headers: invoice_id,customer,amount,paid. USD single-currency only.
+`reconciliation.py` contains the pure parser and reconciliation function. The FastAPI service uses the same file for HTTP execution; the file is kept verbatim in both repositories. `flow.py` adds content-hash-based SQLite report caching and atomic output replacement for command line use.
 
-## Limitations
+The report contains accepted rows, rejected rows, integer-cent totals and a deterministic summary. Repeating an identical file returns a cached report. This is file-level caching, not a global invoice database across changing exports.
 
-Runs offline; scheduling and delivery are outside its scope. Browser preview is a JavaScript illustration; Python source is authoritative. Cache is file-based, not an invoice database across different CSV exports.
+The browser interface has a local JavaScript preview and a Python-service control. Python mode becomes available only when a deployed service URL is configured. It sends the CSV to `/reconcile`; the HTTP path does not save input CSVs. The Python CLI remains usable offline regardless of hosting availability.
 
-## Tests
-
-Ten tests cover decimal parsing, invalid currency values, duplicate and overpaid rows, repeat-run caching, empty files, CSV headers and quoted customer names. Run the test command above to verify your environment.
-
-## Design notes
-
-Currency is parsed with Decimal and stored as integer cents. Each input file is identified by its SHA256 hash. Completed reports are cached in SQLite and written through a temporary file followed by atomic replacement.
-
-MIT licensed. See LICENSE.
+Ten automated tests cover exact decimals, invalid values, duplicate and overpaid rows, file caching, empty files, bad headers and quoted customer names. Scheduling and email delivery are outside the project scope. MIT licensed.
