@@ -11,7 +11,7 @@ python -m pip install pytest
 python -m pytest -q
 ```
 
-Use Python 3.12+ or Node 22+ with pnpm, as applicable. Create and activate a virtual environment for Python dependencies.
+Requires Python 3.12+. Processing uses the standard library; pytest is needed only for tests.
 
 ## Features
 
@@ -19,14 +19,14 @@ Python standard library pipeline. Decimal validation, duplicate rejection, outst
 
 ## Limitations
 
-No LLM or external API integration. No email delivery or scheduling. Browser preview is a JavaScript illustration; Python source is authoritative. Cache is file-based, not an invoice database across different CSV exports.
+Runs offline; scheduling and delivery are outside its scope. Browser preview is a JavaScript illustration; Python source is authoritative. Cache is file-based, not an invoice database across different CSV exports.
 
 ## Tests
 
-Tests live alongside the source and cover business rules and error cases. See the portfolio delivery report for the actual validation results.
+Ten tests cover decimal parsing, invalid currency values, duplicate and overpaid rows, repeat-run caching, empty files, CSV headers and quoted customer names. Run the test command above to verify your environment.
 
-## Explain this project
+## Design notes
 
-Trace one input through validation, state change, and output. Explain the data representation and one failure path. Modify a validation rule and update its test before discussing the project in an interview.
+Currency is parsed with Decimal and stored as integer cents. Each input file is identified by its SHA256 hash. Completed reports are cached in SQLite and written through a temporary file followed by atomic replacement.
 
-MIT licensed. No employment, client work or production outcomes are claimed.
+MIT licensed. See LICENSE.
